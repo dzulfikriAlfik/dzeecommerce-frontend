@@ -78,5 +78,35 @@ Every task must include:
 - security review
 - documentation update
 
-## Current status
-This repository is in the planning and scaffolding stage.
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+
+# Run validation suite
+npm run validate   # lint + typecheck + test + build
+```
+
+## Scripts
+
+| Script           | Description                              |
+| ---------------- | ---------------------------------------- |
+| `npm run dev`    | Start development server                 |
+| `npm run build`  | Production build                         |
+| `npm run lint`   | ESLint check                             |
+| `npm run typecheck` | TypeScript strict type check          |
+| `npm run test`   | Run test suite                           |
+| `npm run test:watch` | Tests in watch mode                  |
+| `npm run test:coverage` | Tests with v8 coverage            |
+| `npm run validate` | Full CI validation pipeline            |
+
+## Current Status
+
+**Foundation complete (Tasks F1 + F2)**
+- All config files, core libraries, and design system implemented
+- 11 tests passing, zero lint/type errors, production build validated
+- See [Frontend Foundation docs](docs/features/frontend-foundation.md) for full details
