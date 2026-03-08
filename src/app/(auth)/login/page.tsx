@@ -1,7 +1,7 @@
-import { PlaceholderFeature } from '@/components/feedback/placeholder-feature';
+import { LoginForm } from '@/modules/auth/components/login-form';
 
 export const metadata = { title: 'Login' };
 
 export default function LoginPage() {
-  return <PlaceholderFeature title="Login" />;
+  return <LoginForm />;
 }

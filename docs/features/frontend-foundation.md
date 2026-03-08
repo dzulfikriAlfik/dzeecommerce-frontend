@@ -5,6 +5,17 @@
 ## Summary
 
 Base frontend project scaffold for Dzeecommerce — a production-grade e-commerce platform.
+Covers the Next.js scaffold (F1) and shared architecture baseline (F2): API client,
+TanStack Query provider, Zustand auth state, and reusable utilities.
+
+## File Mapping to Task Plan
+
+| Task Plan Path | Actual Path | Rationale |
+| --- | --- | --- |
+| `src/app/query-client.ts` | `src/lib/query-client.ts` | `lib/` is the standard location for non-page utilities |
+| `src/stores/auth.store.ts` | `src/store/auth.store.ts` | Singular `store/` follows Zustand convention |
+
+All other file paths match the task plan exactly.
 
 ## Tech Stack
 
@@ -90,3 +101,33 @@ src/
 - `ErrorBoundary` — class component with retry
 - `EmptyState` — configurable icon, title, description, action
 - `PlaceholderFeature` — "Under development" placeholder
+
+## Role Documentation
+
+The foundation layer is shared infrastructure — all roles interact with it indirectly.
+
+| Role | Can Do | Cannot Do |
+| --- | --- | --- |
+| `guest` | View public pages (home, products, login, register). Axios client sends unauthenticated requests. | Access protected routes. Auth store has no user. |
+| `customer` | Full storefront access. Auth store holds session. Cookie-based auth auto-refreshes on 401. | Access admin area. |
+| `customer_support` | Access support-scoped admin views (future). Auth store + role check gates visibility. | Access warehouse, finance, or super-admin features. |
+| `warehouse` | Access warehouse-scoped admin views (future). | Access finance, support, or super-admin features. |
+| `finance` | Access finance-scoped admin views (future). | Access warehouse, support, or super-admin features. |
+| `admin` | Access all admin operational views. | Access super-admin system configuration. |
+| `super_admin` | Full system access including admin configuration. | N/A — highest privilege. |
+
+### UI Visibility Rules
+- `Navbar`: auth buttons (Login/Register) shown for guests; user menu shown for authenticated users
+- `Sidebar`: navigation links filtered by `hasRole()` from auth store
+- `ProtectedLayout`: redirects unauthenticated users; shows "Access Denied" for insufficient role
+- Frontend checks are **UX-only** — backend is the source of truth for authorization
+
+## Security Considerations
+
+1. **Cookie-based auth** — httpOnly cookies managed by backend; no tokens stored in `localStorage` or `sessionStorage`
+2. **Token refresh queue** — Axios interceptor queues concurrent 401 requests during refresh to avoid race conditions; redirects to `/login` on refresh failure
+3. **Error sanitization** — API errors are transformed to a consistent `ApiErrorResponse` shape; raw server internals are not exposed to the UI
+4. **Environment validation** — Zod validates all `NEXT_PUBLIC_*` variables at build/runtime; secrets are never exposed to the client bundle
+5. **Content safety** — `sanitize()` utility strips HTML tags from user-generated strings before rendering
+6. **Security headers** — `next.config.ts` sets `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`
+7. **No persistent sensitive state** — Zustand auth store is in-memory only; it mirrors `/auth/me` for UI display, not as a security boundary
